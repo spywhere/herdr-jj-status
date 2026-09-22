@@ -18,6 +18,8 @@ HERE="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 COMPUTE="$HERE/../lib/compute.sh"
 MAXLEN=48   # keep sidebar tokens compact
 
+export PATH="/opt/homebrew/bin:$PATH"
+
 # report <workspace_id> <cwd>
 report() {
   local wsid="$1" cwd="$2" line bookmark status
