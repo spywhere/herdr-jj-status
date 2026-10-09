@@ -34,9 +34,11 @@ reads "in foo's descendants, at change `xyz`.
 Examples: `↑2` · `↓1 *3` · `!*2` · `↑2↓1`. Set `JJ_STATUS_REMOTE` to compare
 against a remote other than `origin`.
 
-Rows refresh when you switch into a space or run the refresh action (and once at
-herdr startup). herdr has no event for commands run inside a pane, so a row won't
-update live while you stay put — switch away and back, or trigger the action.
+Rows refresh when you switch into a space, an agent's status changes (including
+completion / return to idle), or you run the refresh action (and once at herdr
+startup). herdr has no plugin event for `cd` or arbitrary commands run inside a
+pane, so changing directory alone won't refresh the row — the next trigger reads
+the current directory. Switch away and back, or trigger the action, if needed.
 
 ## Requirements
 

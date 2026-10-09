@@ -34,10 +34,20 @@ command = ["bash", "bin/refresh.sh"]
 on = "workspace.created"
 command = ["bash", "bin/refresh.sh"]
 
+# Workspace updates include worktree membership changes, not shell cd commands.
+[[events]]
+on = "workspace.updated"
+command = ["bash", "bin/refresh.sh"]
+
 [[events]]
 on = "worktree.created"
 command = ["bash", "bin/refresh.sh"]
 
 [[events]]
 on = "worktree.opened"
+command = ["bash", "bin/refresh.sh"]
+
+# Refresh on agent lifecycle transitions, including completion / return to idle.
+[[events]]
+on = "pane.agent_status_changed"
 command = ["bash", "bin/refresh.sh"]

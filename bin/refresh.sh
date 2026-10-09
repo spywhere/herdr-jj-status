@@ -7,7 +7,8 @@
 # herdr populates HERDR_PLUGIN_CONTEXT_JSON with the focused workspace for every
 # invocation, including [[startup]] and [[actions]], so "no context" never happens.
 #
-# workspace.* / worktree.* event: refresh just the workspace named in the context.
+# workspace.* / worktree.* / pane.agent_status_changed events: refresh just the
+# workspace named in the context.
 # Anything else (startup, action, manual run): sweep via `herdr api snapshot`.
 
 set -u
@@ -50,13 +51,19 @@ report() {
 event="${HERDR_PLUGIN_EVENT:-}"
 ctx="${HERDR_PLUGIN_CONTEXT_JSON:-}"
 case "$event" in
-  workspace.*|worktree.*) scoped=1 ;;
+  workspace.*|worktree.*|pane.agent_status_changed) scoped=1 ;;
   *)                      scoped=0 ;;
 esac
 if [ "$scoped" -eq 1 ] && [ -n "$ctx" ]; then
   wsid="$(printf '%s' "$ctx" | jq -r '.workspace_id // empty' 2>/dev/null)"
   if [ -n "$wsid" ]; then
-    cwd="$(printf '%s' "$ctx" | jq -r '.workspace_cwd // .focused_pane_cwd // empty' 2>/dev/null)"
+    if [ "$event" = "pane.agent_status_changed" ]; then
+      # Pane events carry the triggering pane, which may not be focused in its
+      # workspace. Prefer that pane's cwd over the workspace's focused pane.
+      cwd="$(printf '%s' "$ctx" | jq -r '.focused_pane_cwd // .workspace_cwd // empty' 2>/dev/null)"
+    else
+      cwd="$(printf '%s' "$ctx" | jq -r '.workspace_cwd // .focused_pane_cwd // empty' 2>/dev/null)"
+    fi
     report "$wsid" "$cwd"
     exit 0
   fi
